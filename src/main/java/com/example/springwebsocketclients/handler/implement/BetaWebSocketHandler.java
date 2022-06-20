@@ -8,14 +8,21 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BetaWebSocketHandler implements ClientWebSocketHandler {
 
+    private static final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("Beta afterConnectionEstablished, session id : {}, session : {}", session.getId(), session.getUri());
+        sessions.add(session);
     }
 
     @Override
@@ -31,6 +38,7 @@ public class BetaWebSocketHandler implements ClientWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         log.info("Beta afterConnectionClosed, session id : {}, status : {}", session.getId(), closeStatus);
+        sessions.remove(session);
     }
 
     @Override
